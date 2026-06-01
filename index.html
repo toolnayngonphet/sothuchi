@@ -5,59 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sổ Thu Chi - Quản Lý Tài Chính Cá Nhân</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .page { display: none; }
-        .page.active { display: block; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col md:flex-row">
 
-    <div id="auth-screen" class="w-full max-w-md m-auto p-4 page active">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 md:p-8 space-y-6">
+    <div id="auth-screen" class="fixed inset-0 z-50 bg-slate-50 flex flex-col items-center justify-center p-4" style="display: flex;">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-100 p-6 md:p-8 space-y-6">
             <div class="text-center space-y-2">
                 <h1 class="text-3xl font-black tracking-tight text-slate-900">SỔ THU CHI</h1>
                 <p class="text-sm text-slate-400 font-medium" id="auth-subtitle">Đăng nhập để quản lý tài chính</p>
             </div>
 
-            <form id="authForm" class="space-y-4">
+            <form id="authForm" onsubmit="window.handleAuth(event)" class="space-y-4">
                 <div class="space-y-1">
                     <label class="text-xs font-semibold text-slate-500 uppercase">Tên tài khoản</label>
-                    <input id="username" type="text" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 transition" required>
+                    <input id="username" type="text" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 transition bg-slate-50" required>
                 </div>
                 <div class="space-y-1">
                     <label class="text-xs font-semibold text-slate-500 uppercase">Mật khẩu</label>
-                    <input id="password" type="password" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 transition" required>
+                    <input id="password" type="password" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 transition bg-slate-50" required>
                 </div>
-                <button type="submit" id="authBtn" class="w-full bg-slate-900 text-white font-medium py-3 rounded-xl hover:bg-slate-800 transition">
+                <button type="submit" id="authBtn" class="w-full bg-slate-900 text-white font-medium py-3 rounded-xl hover:bg-slate-800 transition shadow-sm">
                     Đăng Nhập
                 </button>
             </form>
 
-            <div class="text-center">
-                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-xs font-semibold text-indigo-600 hover:underline">
+            <div class="text-center space-y-4 pt-2">
+                <button type="button" onclick="window.toggleAuth()" id="toggleAuthBtn" class="text-xs font-semibold text-indigo-600 hover:underline block w-full text-center">
                     Chưa có tài khoản? Đăng ký ngay
+                </button>
+                <button type="button" onclick="window.forceClearStorage()" class="text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg hover:bg-amber-100 transition inline-block mx-auto">
+                    🚨 Sửa lỗi treo: Xóa sạch bộ nhớ cũ để làm mới trang web
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="main-app" class="w-full flex flex-col md:flex-row page">
+    <div id="main-app" class="w-full min-h-screen flex flex-col md:flex-row" style="display: none;">
         
-        <div class="md:hidden fixed top-0 left-0 right-0 bg-slate-900 text-white p-4 flex justify-between items-center z-30 shadow-md">
+        <header class="md:hidden fixed top-0 left-0 right-0 bg-slate-900 text-white p-4 flex justify-between items-center z-30 shadow-md h-16">
             <div class="flex items-center gap-2">
                 <div class="w-6 h-6 bg-white rounded flex items-center justify-center font-bold text-slate-900 text-sm">S</div>
                 <span class="font-bold tracking-wider text-sm">Sổ Thu Chi</span>
             </div>
-            <button onclick="toggleSidebar()" class="text-xl p-1 focus:outline-none">☰</button>
-        </div>
+            <button type="button" onclick="window.toggleSidebar()" class="text-xl p-1 focus:outline-none">☰</button>
+        </header>
 
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-black/40 z-10 md:hidden"></div>
+        <div id="sidebar-overlay" onclick="window.toggleSidebar()" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"></div>
 
-        <aside id="sidebar" class="w-64 bg-slate-900 text-slate-400 flex flex-col justify-between fixed h-full z-20 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        <aside id="sidebar" class="w-64 bg-slate-900 text-slate-400 flex flex-col justify-between fixed top-0 bottom-0 left-0 z-40 transform -translate-x-full md:translate-x-0 md:relative md:transform-none transition-transform duration-300 ease-in-out shadow-lg md:shadow-none flex-shrink-0">
             <div class="p-6 space-y-8">
                 <div class="hidden md:flex items-center gap-3">
                     <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center font-bold text-slate-900 text-lg">S</div>
@@ -65,13 +65,13 @@
                 </div>
                 
                 <nav class="space-y-1">
-                    <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium hover:bg-slate-800 hover:text-white transition text-white bg-slate-800">
+                    <button type="button" id="nav-dashboard" onclick="window.navigateTo('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium hover:bg-slate-800 hover:text-white transition">
                         <span>📊</span> Tổng quan
                     </button>
-                    <button onclick="navigateTo('history')" id="nav-history" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium hover:bg-slate-800 hover:text-white transition">
+                    <button type="button" id="nav-history" onclick="window.navigateTo('history')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium hover:bg-slate-800 hover:text-white transition">
                         <span>📜</span> Lịch sử giao dịch
                     </button>
-                    <button onclick="navigateTo('utilities')" id="nav-utilities" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium hover:bg-slate-800 hover:text-white transition">
+                    <button type="button" id="nav-utilities" onclick="window.navigateTo('utilities')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium hover:bg-slate-800 hover:text-white transition">
                         <span>🛠️</span> Công cụ quản lý
                     </button>
                 </nav>
@@ -80,345 +80,388 @@
             <div class="p-6 border-t border-slate-800 space-y-3">
                 <div class="flex items-center gap-2 px-2">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span id="user-display" class="text-xs font-semibold text-slate-300">User</span>
+                    <span id="user-display" class="text-xs font-semibold text-slate-300 truncate max-w-[180px]">User</span>
                 </div>
-                <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-950/40 text-rose-400 hover:bg-rose-900/60 transition">
+                <button type="button" onclick="window.logout()" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-950/40 text-rose-400 hover:bg-rose-900/60 transition">
                     🚪 Đăng xuất
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 p-4 md:p-8 min-h-screen pt-20 md:pt-8 md:ml-64 w-full">
-            
-            <div id="page-dashboard" class="sub-page space-y-6">
-                <div class="flex justify-between items-center">
+        <div class="flex-1 min-w-0 overflow-y-auto">
+            <main class="p-4 md:p-8 pt-20 md:pt-8 w-full max-w-5xl mx-auto space-y-6">
+                
+                <div id="page-dashboard" class="sub-page space-y-6" style="display: none;">
                     <h2 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Bảng Điều Khiển</h2>
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-1">
-                        <span class="text-xs text-slate-400 font-bold uppercase">Số dư hiện tại</span>
-                        <h3 id="dash-balance" class="text-2xl md:text-3xl font-black text-slate-900">0 đ</h3>
-                    </div>
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-1">
-                        <span class="text-xs text-slate-400 font-bold uppercase text-green-600">Tổng thu</span>
-                        <h3 id="dash-income" class="text-xl md:text-2xl font-bold text-green-600">+0 đ</h3>
-                    </div>
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-1">
-                        <span class="text-xs text-slate-400 font-bold uppercase text-rose-600">Tổng chi</span>
-                        <h3 id="dash-expense" class="text-xl md:text-2xl font-bold text-rose-600">-0 đ</h3>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                        <h4 class="font-bold text-slate-700">Xu hướng dòng tiền chi tiêu lớn</h4>
-                        <div class="h-60 md:h-64"><canvas id="analyticsChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                        <h4 class="font-bold text-slate-700">Thêm nhanh giao dịch</h4>
-                        <form id="quickForm" class="space-y-3">
-                            <input id="q-date" type="date" class="w-full p-2.5 border rounded-xl outline-none" required>
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <select id="q-type" class="w-full sm:w-1/2 p-2.5 border rounded-xl bg-white">
-                                    <option value="chi">Chi tiền</option><option value="thu">Thu tiền</option>
-                                </select>
-                                <input id="q-amount" type="text" oninput="formatInputMoney(this)" placeholder="Số tiền..." class="w-full sm:w-1/2 p-2.5 border rounded-xl outline-none" required>
-                            </div>
-                            <select id="q-cat" class="w-full p-2.5 border rounded-xl bg-white" required>
-                                <option value="" disabled selected hidden>Chọn danh mục...</option>
-                                <option value="Ăn uống">Ăn uống</option><option value="Mua sắm">Mua sắm</option>
-                                <option value="Di chuyển">Di chuyển</option><option value="Hóa đơn & Tiện ích">Hóa đơn & Tiện ích</option>
-                                <option value="Giải trí">Giải trí</option><option value="Sức khỏe">Sức khỏe</option>
-                                <option value="Giáo dục">Giáo dục</option><option value="Lương / Thu nhập">Lương / Thu nhập</option>
-                                <option value="Khác">Khác</option>
-                            </select>
-                            <input id="q-note" type="text" placeholder="Ghi chú..." class="w-full p-2.5 border rounded-xl outline-none">
-                            <button type="submit" class="w-full bg-slate-900 text-white font-medium py-2.5 rounded-xl hover:bg-slate-800 transition">Ghi sổ ngay</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div id="page-history" class="sub-page space-y-6 hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <h2 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Sổ Cái Kế Toán</h2>
-                    <div class="flex gap-2 w-full sm:w-auto">
-                        <button onclick="exportCSV()" class="flex-1 sm:flex-none text-xs font-semibold bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition">Xuất CSV</button>
-                        <button onclick="resetAllData()" class="flex-1 sm:flex-none text-xs font-semibold bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl hover:bg-red-100 transition">Xóa tất cả lịch sử</button>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-3 sm:items-center">
-                    <span class="font-bold text-xs text-slate-400 uppercase tracking-wider">Bộ lọc:</span>
-                    <div class="grid grid-cols-2 gap-2 w-full">
-                        <select id="f-type" onchange="renderDataViews()" class="p-2 border rounded-xl bg-white outline-none text-xs w-full"><option value="all">Tất cả loại hình</option><option value="chi">Khoản Chi</option><option value="thu">Khoản Thu</option></select>
-                        <select id="f-cat" onchange="renderDataViews()" class="p-2 border rounded-xl bg-white outline-none text-xs w-full">
-                            <option value="all">Tất cả danh mục</option><option value="Ăn uống">Ăn uống</option><option value="Mua sắm">Mua sắm</option><option value="Di chuyển">Di chuyển</option><option value="Hóa đơn & Tiện ích">Hóa đơn & Tiện ích</option><option value="Giải trí">Giải trí</option><option value="Sức khỏe">Sức khỏe</option><option value="Giáo dục">Giáo dục</option><option value="Lương / Thu nhập">Lương / Thu nhập</option><option value="Khác">Khác</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden w-full">
-                    <div class="overflow-x-auto w-full">
-                        <table class="w-full text-left border-collapse min-w-[500px]">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-100 text-xs font-bold uppercase text-slate-400 tracking-wider">
-                                    <th class="p-4">Ngày</th><th class="p-4">Danh mục</th><th class="p-4">Ghi chú</th><th class="p-4 text-right">Số tiền</th><th class="p-4 text-center">Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historyTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="page-utilities" class="sub-page space-y-6 hidden">
-                <h2 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Hệ Thống Tiện Ích</h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2">⚠️ Hạn Mức Ngân Sách</h3>
-                        <form id="utilBudgetForm" class="flex flex-col sm:flex-row gap-2">
-                            <select id="ub-cat" class="w-full sm:w-1/2 p-2 border rounded-xl bg-white" required>
-                                <option value="" disabled selected hidden>Chọn danh mục...</option>
-                                <option value="Ăn uống">Ăn uống</option><option value="Mua sắm">Mua sắm</option><option value="Di chuyển">Di chuyển</option><option value="Hóa đơn & Tiện ích">Hóa đơn & Tiện ích</option><option value="Giải trí">Giải trí</option><option value="Khác">Khác</option>
-                            </select>
-                            <div class="flex gap-2 w-full sm:w-1/2">
-                                <input id="ub-limit" type="text" oninput="formatInputMoney(this)" placeholder="Hạn mức đ..." class="w-full p-2 border rounded-xl outline-none" required>
-                                <button type="submit" class="bg-slate-900 text-white px-4 rounded-xl font-bold">+</button>
-                            </div>
-                        </form>
-                        <div id="utilBudgetList" class="space-y-3 max-h-60 overflow-y-auto pr-1"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+                            <span class="text-xs text-slate-400 font-bold uppercase">Số dư hiện tại</span>
+                            <h3 id="dash-balance" class="text-2xl md:text-3xl font-black text-slate-900">0 đ</h3>
+                        </div>
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+                            <span class="text-xs text-slate-400 font-bold uppercase text-green-600">Tổng thu</span>
+                            <h3 id="dash-income" class="text-xl md:text-2xl font-bold text-green-600">+0 đ</h3>
+                        </div>
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+                            <span class="text-xs text-slate-400 font-bold uppercase text-rose-600">Tổng chi</span>
+                            <h3 id="dash-expense" class="text-xl md:text-2xl font-bold text-rose-600">-0 đ</h3>
+                        </div>
                     </div>
 
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2">🐷 Kế Hoạch Tích Lũy</h3>
-                        <form id="utilSavingForm" class="space-y-2">
-                            <input id="us-name" type="text" placeholder="Tên mục tiêu tích lũy..." class="w-full p-2 border rounded-xl outline-none" required>
-                            <div class="flex gap-2">
-                                <input id="us-target" type="text" oninput="formatInputMoney(this)" placeholder="Số tiền đích..." class="w-2/3 p-2 border rounded-xl outline-none" required>
-                                <button type="submit" class="w-1/3 bg-slate-900 text-white rounded-xl font-medium text-xs">Khởi tạo</button>
-                            </div>
-                        </form>
-                        <div id="utilSavingList" class="space-y-3 max-h-48 overflow-y-auto pr-1"></div>
-                    </div>
-
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2">🤝 Quản Lý Sổ Vay & Nợ</h3>
-                        <form id="utilDebtForm" class="space-y-2">
-                            <div class="flex gap-2">
-                                <select id="ud-type" class="w-1/3 p-2 border rounded-xl bg-white"><option value="Đi vay">Đi vay</option><option value="Cho vay">Cho vay</option></select>
-                                <input id="ud-person" type="text" placeholder="Tên đối tác..." class="w-2/3 p-2 border rounded-xl outline-none" required>
-                            </div>
-                            <div class="flex gap-2">
-                                <input id="ud-amount" type="text" oninput="formatInputMoney(this)" placeholder="Số tiền..." class="w-2/3 p-2 border rounded-xl outline-none" required>
-                                <button type="submit" class="w-1/3 bg-slate-900 text-white rounded-xl font-medium text-xs">Ghi nợ</button>
-                            </div>
-                        </form>
-                        <div id="utilDebtList" class="space-y-3 max-h-48 overflow-y-auto pr-1"></div>
-                    </div>
-
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2">🔄 Khoản Chi Định Kỳ</h3>
-                        <form id="utilRecurringForm" class="space-y-2">
-                            <div class="flex gap-2">
-                                <select id="ur-cycle" class="w-1/2 p-2 border rounded-xl bg-white"><option value="Hàng ngày">Hàng ngày</option><option value="Hàng tháng">Hàng tháng</option></select>
-                                <select id="ur-type" class="w-1/2 p-2 border rounded-xl bg-white"><option value="chi">Tự động Chi</option><option value="thu">Tự động Thu</option></select>
-                            </div>
-                            <div class="flex gap-2">
-                                <select id="ur-cat" class="w-1/2 p-2 border rounded-xl bg-white" required>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                            <h4 class="font-bold text-slate-700">Tỷ trọng chi tiêu theo danh mục</h4>
+                            <div id="chartContainer" class="space-y-3 pt-2"></div>
+                        </div>
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                            <h4 class="font-bold text-slate-700">Thêm nhanh giao dịch</h4>
+                            <form id="quickForm" onsubmit="window.handleQuickFormSubmit(event)" class="space-y-3">
+                                <input id="q-date" type="date" class="w-full p-2.5 border rounded-xl outline-none text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-slate-900 transition" required>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <select id="q-type" class="w-full sm:w-1/2 p-2.5 border rounded-xl bg-slate-50 text-sm">
+                                        <option value="chi">Chi tiền</option><option value="thu">Thu tiền</option>
+                                    </select>
+                                    <input id="q-amount" type="text" placeholder="Số tiền..." class="w-full sm:w-1/2 p-2.5 border rounded-xl outline-none text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-slate-900 transition" required>
+                                </div>
+                                <select id="q-cat" class="w-full p-2.5 border rounded-xl bg-slate-50 text-sm" required>
                                     <option value="" disabled selected hidden>Chọn danh mục...</option>
-                                    <option value="Ăn uống">Ăn uống</option><option value="Hóa đơn & Tiện ích">Hóa đơn & Tiện ích</option><option value="Giải trí">Giải trí</option><option value="Lương / Thu nhập">Lương / Thu nhập</option>
+                                    <option value="Ăn uống">Ăn uống</option><option value="Mua sắm">Mua sắm</option>
+                                    <option value="Di chuyển">Di chuyển</option><option value="Hóa đơn & Tiện ích">Hóa đơn & Tiện ích</option>
+                                    <option value="Giải trí">Giải trí</option><option value="Sức khỏe">Sức khỏe</option>
+                                    <option value="Giáo dục">Giáo dục</option><option value="Lương / Thu nhập">Lương / Thu nhập</option>
+                                    <option value="Khác">Khác</option>
                                 </select>
-                                <input id="ur-amount" type="text" oninput="formatInputMoney(this)" placeholder="Số tiền..." class="w-1/2 p-2 border rounded-xl outline-none" required>
-                            </div>
-                            <button type="submit" class="w-full bg-slate-900 text-white font-medium py-2 rounded-xl hover:bg-slate-800 transition text-xs">Kích hoạt cấu hình</button>
-                        </form>
-                        <div id="utilRecurringList" class="space-y-3 max-h-40 overflow-y-auto pr-1"></div>
+                                <input id="q-note" type="text" placeholder="Ghi chú..." class="w-full p-2.5 border rounded-xl outline-none text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-slate-900 transition">
+                                <button type="submit" class="w-full bg-slate-900 text-white font-medium py-2.5 rounded-xl hover:bg-slate-800 transition shadow-sm">Ghi sổ ngay</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
+
+                <div id="page-history" class="sub-page space-y-6" style="display: none;">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <h2 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Sổ Cái Kế Toán</h2>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button type="button" onclick="window.exportCSV()" class="flex-1 sm:flex-none text-xs font-semibold bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 transition shadow-sm">Xuất Excel</button>
+                            <button type="button" onclick="window.resetAllData()" class="flex-1 sm:flex-none text-xs font-semibold bg-red-50 text-red-600 border border-red-200 px-4 py-2.5 rounded-xl hover:bg-red-100 transition">Xóa tất cả lịch sử</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-3 sm:items-center">
+                        <span class="font-bold text-xs text-slate-400 uppercase tracking-wider">Bộ lọc:</span>
+                        <div class="grid grid-cols-2 gap-2 w-full sm:max-w-md">
+                            <select id="f-type" onchange="window.renderDataViews()" class="p-2 border rounded-xl bg-white outline-none text-xs w-full"><option value="all">Tất cả loại</option><option value="chi">Khoản Chi</option><option value="thu">Khoản Thu</option></select>
+                            <select id="f-cat" onchange="window.renderDataViews()" class="p-2 border rounded-xl bg-white outline-none text-xs w-full">
+                                <option value="all">Tất cả danh mục</option><option value="Ăn uống">Ăn uống</option><option value="Mua sắm">Mua sắm</option><option value="Di chuyển">Di chuyển</option><option value="Hóa đơn & Tiện ích">Hóa đơn & Tiện ích</option><option value="Giải trí">Giải trí</option><option value="Sức khỏe">Sức khỏe</option><option value="Giáo dục">Giáo dục</option><option value="Lương / Thu nhập">Lương / Thu nhập</option><option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden w-full">
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse min-w-[550px]">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-100 text-xs font-bold uppercase text-slate-400 tracking-wider">
+                                        <th class="p-4">Ngày</th><th class="p-4">Danh mục</th><th class="p-4">Ghi chú</th><th class="p-4 text-right">Số tiền</th><th class="p-4 text-center">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-utilities" class="sub-page space-y-6" style="display: none;">
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Hệ Thống Tiện Ích</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">⚠️ Hạn Mức Ngân Sách</h3>
+                            <form id="utilBudgetForm" onsubmit="window.handleBudgetSubmit(event)" class="flex flex-col sm:flex-row gap-2">
+                                <select id="ub-cat" class="w-full sm:w-1/2 p-2 border rounded-xl bg-slate-50 text-sm" required>
+                                    <option value="" disabled selected hidden>Chọn danh mục...</option>
+                                    <option value="Ăn uống">Ăn uống</option><option value="Mua sắm">Mua sắm</option><option value="Di chuyển">Di chuyển</option><option value="Hóa đơn & Tiện ích">Hóa đơn & Tiện ích</option><option value="Giải trí">Giải trí</option><option value="Khác">Khác</option>
+                                </select>
+                                <div class="flex gap-2 w-full sm:w-1/2">
+                                    <input id="ub-limit" type="text" placeholder="Hạn mức đ..." class="w-full p-2 border rounded-xl outline-none bg-slate-50 text-sm" required>
+                                    <button type="submit" class="bg-slate-900 text-white px-4 rounded-xl font-bold">+</button>
+                                </div>
+                            </form>
+                            <div id="utilBudgetList" class="space-y-3 max-h-60 overflow-y-auto pr-1"></div>
+                        </div>
+
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">🐷 Kế Hoạch Tích Lũy</h3>
+                            <form id="utilSavingForm" onsubmit="window.handleSavingSubmit(event)" class="space-y-2">
+                                <input id="us-name" type="text" placeholder="Tên mục tiêu tích lũy..." class="w-full p-2 border rounded-xl outline-none bg-slate-50 text-sm" required>
+                                <div class="flex gap-2">
+                                    <input id="us-target" type="text" placeholder="Số tiền đích..." class="w-2/3 p-2 border rounded-xl outline-none bg-slate-50 text-sm" required>
+                                    <button type="submit" class="w-1/3 bg-slate-900 text-white rounded-xl font-medium text-xs shadow-sm">Khởi tạo</button>
+                                </div>
+                            </form>
+                            <div id="utilSavingList" class="space-y-3 max-h-48 overflow-y-auto pr-1"></div>
+                        </div>
+
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">🤝 Quản Lý Sổ Vay & Nợ</h3>
+                            <form id="utilDebtForm" onsubmit="window.handleDebtSubmit(event)" class="space-y-2">
+                                <div class="flex gap-2">
+                                    <select id="ud-type" class="w-1/3 p-2 border rounded-xl bg-slate-50 text-sm"><option value="Đi vay">Đi vay</option><option value="Cho vay">Cho vay</option></select>
+                                    <input id="ud-person" type="text" placeholder="Tên đối tác..." class="w-2/3 p-2 border rounded-xl outline-none bg-slate-50 text-sm" required>
+                                </div>
+                                <div class="flex gap-2">
+                                    <input id="ud-amount" type="text" placeholder="Số tiền..." class="w-2/3 p-2 border rounded-xl outline-none bg-slate-50 text-sm" required>
+                                    <button type="submit" class="w-1/3 bg-slate-900 text-white rounded-xl font-medium text-xs shadow-sm">Ghi nợ</button>
+                                </div>
+                            </form>
+                            <div id="utilDebtList" class="space-y-3 max-h-48 overflow-y-auto pr-1"></div>
+                        </div>
+
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">🔄 Khoản Chi Định Kỳ</h3>
+                            <form id="utilRecurringForm" onsubmit="window.handleRecurringSubmit(event)" class="space-y-2">
+                                <div class="flex gap-2">
+                                    <select id="ur-cycle" class="w-1/2 p-2 border rounded-xl bg-slate-50 text-sm"><option value="Hàng ngày">Hàng ngày</option><option value="Hàng tháng">Hàng tháng</option></select>
+                                    <select id="ur-type" class="w-1/2 p-2 border rounded-xl bg-slate-50 text-sm"><option value="chi">Tự động Chi</option><option value="thu">Tự động Thu</option></select>
+                                </div>
+                                <div class="flex gap-2">
+                                    <select id="ur-cat" class="w-1/2 p-2 border rounded-xl bg-slate-50 text-sm" required>
+                                        <option value="" disabled selected hidden>Chọn danh mục...</option>
+                                        <option value="Ăn uống">Ăn uống</option><option value="Hóa đơn & Tiện ích">Hóa đơn & Tiện ích</option><option value="Giải trí">Giải trí</option><option value="Lương / Thu nhập">Lương / Thu nhập</option>
+                                    </select>
+                                    <input id="ur-amount" type="text" placeholder="Số tiền..." class="w-1/2 p-2 border rounded-xl outline-none bg-slate-50 text-sm" required>
+                                </div>
+                                <button type="submit" class="w-full bg-slate-900 text-white font-medium py-2 rounded-xl hover:bg-slate-800 transition text-xs shadow-sm">Kích hoạt</button>
+                            </form>
+                            <div id="utilRecurringList" class="space-y-3 max-h-40 overflow-y-auto pr-1"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>
-        let isRegisterMode = false;
-        let currentUser = localStorage.getItem('sothuchi_current_user') || null;
-        let userFinanceData = { transactions: [], budgets: [], debts: [], savings: [], recurring: [] };
-        let globalChartInstance = null;
+        window.authMode = 'login';
+        window.currentUser = null;
+        window.userFinanceData = { transactions: [], budgets: [], debts: [], savings: [], recurring: [] };
 
-        document.getElementById('q-date').valueAsDate = new Date();
-
-        // Ẩn/Hiện Menu Sidebar trên điện thoại
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-
-        function formatInputMoney(input) {
+        // Hàm định dạng số tiền tệ ngăn cách dấu chấm hàng nghìn
+        window.formatInputMoney = function(input) {
             let value = input.value.replace(/\D/g, '');
             if (value !== '') value = parseInt(value, 10).toLocaleString('vi-VN').replace(/,/g, '.');
             input.value = value;
-        }
+        };
 
         function getMoneyValue(id) {
-            let val = document.getElementById(id).value;
-            return parseInt(val.replace(/\./g, '')) || 0;
+            const el = document.getElementById(id);
+            return el ? (parseInt(el.value.replace(/\./g, '')) || 0) : 0;
         }
 
-        const formatMoney = (a) => parseInt(a).toLocaleString('vi-VN').replace(/,/g, '.') + ' đ';
+        const formatMoney = (amount) => parseInt(amount || 0).toLocaleString('vi-VN').replace(/,/g, '.') + ' đ';
 
-        function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            document.getElementById('auth-subtitle').textContent = isRegisterMode ? "Tạo tài khoản tài chính mới" : "Đăng nhập để quản lý tài chính";
-            document.getElementById('authBtn').textContent = isRegisterMode ? "Đăng Ký Tài Khoản" : "Đăng Nhập";
-            document.getElementById('toggleAuthBtn').textContent = isRegisterMode ? "Đã có tài khoản? Đăng nhập" : "Chưa có tài khoản? Đăng ký ngay";
-            document.getElementById('authForm').reset();
+        // Đăng ký sự kiện định dạng tiền cho tất cả các ô input số
+        function bindMoneyInputs() {
+            ['q-amount', 'ub-limit', 'us-target', 'ud-amount', 'ur-amount'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.oninput = function() { window.formatInputMoney(this); };
+                }
+            });
         }
 
-        document.getElementById('authForm').onsubmit = function(e) {
-            e.preventDefault();
-            const user = document.getElementById('username').value.trim().toLowerCase();
-            const pass = document.getElementById('password').value;
-            let accounts = JSON.parse(localStorage.getItem('sothuchi_accounts')) || {};
-
-            if (isRegisterMode) {
-                if (accounts[user]) return alert('Tài khoản này đã tồn tại trên hệ thống!');
-                accounts[user] = { password: pass };
-                localStorage.setItem('sothuchi_accounts', JSON.stringify(accounts));
-                alert('Đăng ký tài khoản thành công! Hãy đăng nhập.');
-                toggleAuthMode();
-            } else {
-                if (!accounts[user] || accounts[user].password !== pass) return alert('Tên đăng nhập hoặc mật khẩu không chính xác.');
-                currentUser = user;
-                localStorage.setItem('sothuchi_current_user', user);
-                loginSuccess();
+        window.forceClearStorage = function() {
+            if(confirm("Xác nhận xóa hoàn toàn bộ nhớ đệm cũ bị lỗi? Hệ thống sẽ khôi phục trạng thái mới tinh.")) {
+                localStorage.clear();
+                alert("Làm sạch thành công! Trang web đang làm mới lại.");
+                window.location.reload();
             }
         };
 
-        function loginSuccess() {
-            document.getElementById('auth-screen').classList.remove('active');
-            document.getElementById('main-app').classList.add('active');
-            document.getElementById('user-display').textContent = "Tài khoản: " + currentUser.toUpperCase();
+        window.toggleAuth = function() {
+            const subtitle = document.getElementById('auth-subtitle');
+            const btn = document.getElementById('authBtn');
+            const toggleBtn = document.getElementById('toggleAuthBtn');
             
-            userFinanceData = JSON.parse(localStorage.getItem('data_' + currentUser)) || { transactions: [], budgets: [], debts: [], savings: [], recurring: [] };
-            
-            processAutoRecurring();
-            navigateTo('dashboard');
-        }
-
-        function logout() {
-            localStorage.removeItem('sothuchi_current_user');
-            currentUser = null;
-            document.getElementById('main-app').classList.remove('active');
-            document.getElementById('auth-screen').classList.add('active');
-            document.getElementById('authForm').reset();
-        }
-
-        if (currentUser) { loginSuccess(); }
-
-        function navigateTo(pageId) {
-            document.querySelectorAll('.sub-page').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('aside nav button').forEach(el => el.classList.remove('bg-slate-800', 'text-white'));
-            
-            document.getElementById('page-' + pageId).classList.remove('hidden');
-            document.getElementById('nav-' + pageId).classList.add('bg-slate-800', 'text-white');
-            
-            // Tự đóng sidebar trên mobile khi chuyển trang
-            if (window.innerWidth < 768) {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('sidebar-overlay');
-                if(!sidebar.classList.contains('-translate-x-full')) {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
-                }
+            if (window.authMode === 'login') {
+                window.authMode = 'register';
+                subtitle.innerText = "Tạo tài khoản tài chính mới";
+                btn.innerText = "Đăng Ký Tài Khoản";
+                toggleBtn.innerText = "Đã có tài khoản? Đăng nhập ngay";
+            } else {
+                window.authMode = 'login';
+                subtitle.innerText = "Đăng nhập để quản lý tài chính";
+                btn.innerText = "Đăng Nhập";
+                toggleBtn.innerText = "Chưa có tài khoản? Đăng ký ngay";
             }
+            document.getElementById('authForm').reset();
+        };
+
+        window.handleAuth = function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim().toLowerCase();
+            const pass = document.getElementById('password').value;
             
-            renderDataViews();
-        }
+            let accounts = {};
+            try {
+                accounts = JSON.parse(localStorage.getItem('sothuchi_accounts')) || {};
+            } catch(err) { accounts = {}; }
+
+            if (window.authMode === 'register') {
+                if (accounts[user]) return alert('Tài khoản này đã tồn tại!');
+                accounts[user] = { password: pass };
+                localStorage.setItem('sothuchi_accounts', JSON.stringify(accounts));
+                alert('Đăng ký tài khoản thành công! Hãy thực hiện đăng nhập.');
+                window.toggleAuth();
+            } else {
+                if (!accounts[user] || accounts[user].password !== pass) return alert('Tên đăng nhập hoặc mật khẩu không chính xác.');
+                window.currentUser = user;
+                localStorage.setItem('sothuchi_current_user', user);
+                window.loginSuccess();
+            }
+        };
+
+        window.loginSuccess = function() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            document.getElementById('user-display').innerText = "Tài khoản: " + window.currentUser.toUpperCase();
+            
+            let rawData = {};
+            try {
+                rawData = JSON.parse(localStorage.getItem('data_' + window.currentUser)) || {};
+            } catch(e) { rawData = {}; }
+
+            window.userFinanceData = {
+                transactions: Array.isArray(rawData.transactions) ? rawData.transactions : [],
+                budgets: Array.isArray(rawData.budgets) ? rawData.budgets : [],
+                debts: Array.isArray(rawData.debts) ? rawData.debts : [],
+                savings: Array.isArray(rawData.savings) ? rawData.savings : [],
+                recurring: Array.isArray(rawData.recurring) ? rawData.recurring : []
+            };
+            
+            bindMoneyInputs();
+            window.processAutoRecurring();
+            window.navigateTo('dashboard');
+        };
+
+        window.logout = function() {
+            localStorage.removeItem('sothuchi_current_user');
+            window.currentUser = null;
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'flex';
+            document.getElementById('authForm').reset();
+        };
+
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        };
+
+        window.navigateTo = function(pageId) {
+            document.getElementById('page-dashboard').style.display = 'none';
+            document.getElementById('page-history').style.display = 'none';
+            document.getElementById('page-utilities').style.display = 'none';
+            
+            document.getElementById('page-' + pageId).style.display = 'block';
+            
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('bg-slate-800', 'text-white'));
+            const activeNav = document.getElementById('nav-' + pageId);
+            if(activeNav) activeNav.classList.add('bg-slate-800', 'text-white');
+            
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-overlay').classList.add('hidden');
+            }
+            window.renderDataViews();
+        };
 
         function saveUserData() {
-            localStorage.setItem('data_' + currentUser, JSON.stringify(userFinanceData));
+            if(window.currentUser) localStorage.setItem('data_' + window.currentUser, JSON.stringify(window.userFinanceData));
         }
 
-        document.getElementById('quickForm').onsubmit = (e) => {
+        window.handleQuickFormSubmit = function(e) {
             e.preventDefault();
             const [y, m, d] = document.getElementById('q-date').value.split('-');
             const amt = getMoneyValue('q-amount');
             if(amt <= 0) return alert("Số tiền không hợp lệ!");
             
-            userFinanceData.transactions.unshift({
+            window.userFinanceData.transactions.unshift({
                 id: Date.now(), type: document.getElementById('q-type').value, amount: amt,
                 category: document.getElementById('q-cat').value, note: document.getElementById('q-note').value, date: `${d}/${m}/${y}`
             });
-            saveUserData(); renderDataViews(); e.target.reset(); document.getElementById('q-date').valueAsDate = new Date();
+            saveUserData(); window.renderDataViews(); e.target.reset(); document.getElementById('q-date').valueAsDate = new Date();
         };
 
-        document.getElementById('utilBudgetForm').onsubmit = (e) => {
+        window.handleBudgetSubmit = function(e) {
             e.preventDefault();
             const limit = getMoneyValue('ub-limit'); if(limit <= 0) return;
-            userFinanceData.budgets.push({ id: Date.now(), cat: document.getElementById('ub-cat').value, limit: limit });
-            saveUserData(); renderDataViews(); e.target.reset();
+            window.userFinanceData.budgets.push({ id: Date.now(), cat: document.getElementById('ub-cat').value, limit: limit });
+            saveUserData(); window.renderDataViews(); e.target.reset();
         };
 
-        document.getElementById('utilSavingForm').onsubmit = (e) => {
+        window.handleSavingSubmit = function(e) {
             e.preventDefault();
             const target = getMoneyValue('us-target'); if(target <= 0) return;
-            userFinanceData.savings.push({ id: Date.now(), name: document.getElementById('us-name').value, target: target, current: 0 });
-            saveUserData(); renderDataViews(); e.target.reset();
+            window.userFinanceData.savings.push({ id: Date.now(), name: document.getElementById('us-name').value, target: target, current: 0 });
+            saveUserData(); window.renderDataViews(); e.target.reset();
         };
 
-        document.getElementById('utilDebtForm').onsubmit = (e) => {
+        window.handleDebtSubmit = function(e) {
             e.preventDefault();
             const amt = getMoneyValue('ud-amount'); if(amt <= 0) return;
-            userFinanceData.debts.push({ id: Date.now(), type: document.getElementById('ud-type').value, person: document.getElementById('ud-person').value, amount: amt, paid: 0 });
-            saveUserData(); renderDataViews(); e.target.reset();
+            window.userFinanceData.debts.push({ id: Date.now(), type: document.getElementById('ud-type').value, person: document.getElementById('ud-person').value, amount: amt, paid: 0 });
+            saveUserData(); window.renderDataViews(); e.target.reset();
         };
 
-        document.getElementById('utilRecurringForm').onsubmit = (e) => {
+        window.handleRecurringSubmit = function(e) {
             e.preventDefault();
             const amt = getMoneyValue('ur-amount'); if(amt <= 0) return;
-            userFinanceData.recurring.push({ id: Date.now(), cycle: document.getElementById('ur-cycle').value, type: document.getElementById('ur-type').value, amount: amt, cat: document.getElementById('ur-cat').value, lastTriggered: new Date().toLocaleDateString('vi-VN') });
-            saveUserData(); renderDataViews(); e.target.reset();
+            window.userFinanceData.recurring.push({ id: Date.now(), cycle: document.getElementById('ur-cycle').value, type: document.getElementById('ur-type').value, amount: amt, cat: document.getElementById('ur-cat').value, lastTriggered: new Date().toLocaleDateString('vi-VN') });
+            saveUserData(); window.renderDataViews(); e.target.reset();
         };
 
-        function deleteItem(arrayKey, id) {
-            if(confirm('Xác nhận xóa bỏ mục này khỏi tài khoản của bạn?')) {
-                userFinanceData[arrayKey] = userFinanceData[arrayKey].filter(x => x.id !== id);
-                saveUserData(); renderDataViews();
+        window.deleteItem = function(arrayKey, id) {
+            if(confirm('Xác nhận xóa bỏ mục này khỏi tài khoản?')) {
+                window.userFinanceData[arrayKey] = window.userFinanceData[arrayKey].filter(x => x.id !== id);
+                saveUserData(); window.renderDataViews();
             }
-        }
+        };
 
-        function updateUtilAmount(type, id, msg) {
+        window.updateUtilAmount = function(type, id, msg) {
             let val = prompt(msg);
             if(val) {
                 val = parseInt(val.replace(/\D/g, ''));
                 if(!isNaN(val) && val > 0) {
-                    let item = userFinanceData[type].find(x => x.id === id);
+                    let item = window.userFinanceData[type].find(x => x.id === id);
                     if(type === 'debts') item.paid += val;
                     if(type === 'savings') item.current += val;
-                    saveUserData(); renderDataViews();
+                    saveUserData(); window.renderDataViews();
                 }
             }
-        }
+        };
 
-        function resetAllData() {
-            if(confirm('CẢNH BÁO NGUY HIỂM: Hành động này sẽ xóa sạch toàn bộ lịch sử thu chi, ngân sách, vay nợ của tài khoản này từ trước đến nay. Bạn vẫn muốn tiếp tục chứ?')) {
-                userFinanceData = { transactions: [], budgets: [], debts: [], savings: [], recurring: [] };
+        window.resetAllData = function() {
+            if(confirm('CẢNH BÁO NGUY HIỂM: Xóa toàn bộ lịch sử thu chi và dữ liệu của tài khoản hiện tại?')) {
+                window.userFinanceData = { transactions: [], budgets: [], debts: [], savings: [], recurring: [] };
                 saveUserData();
-                renderDataViews();
+                window.renderDataViews();
             }
-        }
+        };
 
-        function processAutoRecurring() {
+        window.processAutoRecurring = function() {
             const todayStr = new Date().toLocaleDateString('vi-VN');
             let hasNew = false;
-            userFinanceData.recurring.forEach(r => {
+            window.userFinanceData.recurring.forEach(r => {
                 if(r.lastTriggered !== todayStr) {
-                    userFinanceData.transactions.unshift({
+                    window.userFinanceData.transactions.unshift({
                         id: Date.now() + Math.random(), type: r.type, amount: r.amount,
                         category: r.cat, note: `Tự động định kỳ (${r.cycle})`, date: todayStr
                     });
@@ -427,103 +470,151 @@
                 }
             });
             if(hasNew) saveUserData();
-        }
+        };
 
-        function renderDataViews() {
-            if(!currentUser) return;
+        window.renderDataViews = function() {
+            if(!window.currentUser) return;
 
-            const incAll = userFinanceData.transactions.filter(t => t.type === 'thu').reduce((a,b)=>a+b.amount,0);
-            const expAll = userFinanceData.transactions.filter(t => t.type === 'chi').reduce((a,b)=>a+b.amount,0);
-            
-            document.getElementById('dash-balance').textContent = formatMoney(incAll - expAll);
-            document.getElementById('dash-income').textContent = '+' + formatMoney(incAll);
-            document.getElementById('dash-expense').textContent = '-' + formatMoney(expAll);
-
-            // Vẽ biểu đồ xu hướng
-            const ctx = document.getElementById('analyticsChart').getContext('2d');
-            if(globalChartInstance) globalChartInstance.destroy();
-            
-            const topCategories = ['Ăn uống', 'Mua sắm', 'Di chuyển', 'Hóa đơn & Tiện ích', 'Giải trí'];
-            const chartDataValues = topCategories.map(cat => {
-                return userFinanceData.transactions.filter(t => t.type === 'chi' && t.category === cat).reduce((a,b)=>a+b.amount,0);
+            const txs = window.userFinanceData.transactions || [];
+            let incAll = 0, expAll = 0;
+            txs.forEach(t => {
+                if(t.type === 'thu') incAll += t.amount;
+                if(t.type === 'chi') expAll += t.amount;
             });
+            
+            document.getElementById('dash-balance').innerText = formatMoney(incAll - expAll);
+            document.getElementById('dash-income').innerText = '+' + formatMoney(incAll);
+            document.getElementById('dash-expense').innerText = '-' + formatMoney(expAll);
 
-            globalChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: topCategories,
-                    datasets: [{ label: 'Tiêu dùng (đ)', data: chartDataValues, backgroundColor: '#1e293b', borderRadius: 6 }]
-                },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
+            // Vẽ đồ thị bằng HTML Bar thuần (Siêu ổn định)
+            const chartContainer = document.getElementById('chartContainer');
+            if (chartContainer) {
+                chartContainer.innerHTML = '';
+                const categories = ['Ăn uống', 'Mua sắm', 'Di chuyển', 'Hóa đơn & Tiện ích', 'Giải trí', 'Khác'];
+                let maxExpense = 0;
+                const catTotals = categories.map(cat => {
+                    let total = 0;
+                    txs.forEach(t => { if(t.type === 'chi' && t.category === cat) total += t.amount; });
+                    if (total > maxExpense) maxExpense = total;
+                    return { name: cat, total: total };
+                });
 
-            // Lịch sử hiển thị kèm bộ lọc
-            const fType = document.getElementById('f-type').value;
-            const fCat = document.getElementById('f-cat').value;
-            let fList = userFinanceData.transactions;
-
-            if(fType !== 'all') fList = fList.filter(t => t.type === fType);
-            if(fCat !== 'all') fList = fList.filter(t => t.category === fCat);
-
-            const tbody = document.getElementById('historyTableBody'); tbody.innerHTML = '';
-            if(fList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">Không có bản ghi thu chi nào.</td></tr>`;
-            } else {
-                fList.forEach(t => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                            <td class="p-4 font-medium text-slate-600 whitespace-nowrap">${t.date}</td>
-                            <td class="p-4"><span class="bg-slate-100 px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-600 whitespace-nowrap">${t.category}</span></td>
-                            <td class="p-4 text-slate-500 max-w-[150px] truncate">${t.note || '-'}</td>
-                            <td class="p-4 text-right font-bold ${t.type=='thu'?'text-green-600':'text-rose-600'} whitespace-nowrap">${t.type=='thu'?'+':'-'}${formatMoney(t.amount)}</td>
-                            <td class="p-4 text-center"><button onclick="deleteItem('transactions', ${t.id})" class="text-rose-500 hover:underline font-semibold text-xs">Xóa</button></td>
-                        </tr>`;
+                catTotals.forEach(c => {
+                    const percent = maxExpense > 0 ? (c.total / maxExpense) * 100 : 0;
+                    chartContainer.innerHTML += `
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-medium text-slate-600">
+                                <span>${c.name}</span>
+                                <span class="font-bold">${formatMoney(c.total)}</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-3 rounded-lg overflow-hidden">
+                                <div class="bg-slate-800 h-full rounded-lg" style="width: ${percent}%"></div>
+                            </div>
+                        </div>`;
                 });
             }
 
+            // Sổ cái lịch sử
+            const fType = document.getElementById('f-type').value;
+            const fCat = document.getElementById('f-cat').value;
+            const tbody = document.getElementById('historyTableBody');
+            if(tbody) {
+                tbody.innerHTML = '';
+                let fList = txs;
+                if(fType !== 'all') fList = fList.filter(t => t.type === fType);
+                if(fCat !== 'all') fList = fList.filter(t => t.category === fCat);
+
+                if(fList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">Không có bản ghi thu chi nào.</td></tr>`;
+                } else {
+                    fList.forEach(t => {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                                <td class="p-4 font-medium text-slate-600 whitespace-nowrap">${t.date}</td>
+                                <td class="p-4"><span class="bg-slate-100 px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-600 whitespace-nowrap">${t.category}</span></td>
+                                <td class="p-4 text-slate-500 max-w-[150px] truncate">${t.note || '-'}</td>
+                                <td class="p-4 text-right font-bold ${t.type=='thu'?'text-green-600':'text-rose-600'} whitespace-nowrap">${t.type=='thu'?'+':'-'}${formatMoney(t.amount)}</td>
+                                <td class="p-4 text-center"><button type="button" onclick="window.deleteItem('transactions', ${t.id})" class="text-rose-500 hover:underline font-semibold text-xs">Xóa</button></td>
+                            </tr>`;
+                    });
+                }
+            }
+
             // Ngân sách hạn mức
-            const bContainer = document.getElementById('utilBudgetList'); bContainer.innerHTML = '';
-            userFinanceData.budgets.forEach(b => {
-                const spent = userFinanceData.transactions.filter(t => t.type === 'chi' && t.category === b.cat).reduce((a,b)=>a+b.amount,0);
-                const percent = Math.min((spent / b.limit) * 100, 100);
-                const color = percent >= 100 ? 'bg-rose-600 animate-pulse' : percent > 80 ? 'bg-amber-500' : 'bg-emerald-500';
-                bContainer.innerHTML += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-100 group"><div class="flex justify-between mb-1"><span class="font-bold text-slate-700">${b.cat}</span><button onclick="deleteItem('budgets',${b.id})" class="text-rose-500 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">Xóa</button></div><div class="flex justify-between text-xs text-slate-500 mb-1"><span>Tiêu dùng: ${formatMoney(spent)}</span><span>Hạn mức: ${formatMoney(b.limit)}</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="${color} h-2 rounded-full" style="width: ${percent}%"></div></div></div>`;
-            });
+            const bContainer = document.getElementById('utilBudgetList');
+            if(bContainer) {
+                bContainer.innerHTML = '';
+                window.userFinanceData.budgets.forEach(b => {
+                    let spent = 0;
+                    txs.forEach(t => { if(t.type === 'chi' && t.category === b.cat) spent += t.amount; });
+                    const percent = b.limit ? Math.min((spent / b.limit) * 100, 100) : 0;
+                    const color = percent >= 100 ? 'bg-rose-600 animate-pulse' : percent > 80 ? 'bg-amber-500' : 'bg-emerald-500';
+                    bContainer.innerHTML += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-100"><div class="flex justify-between mb-1"><span class="font-bold text-slate-700">${b.cat}</span><button type="button" onclick="window.deleteItem('budgets',${b.id})" class="text-rose-500 text-xs font-bold">Xóa</button></div><div class="flex justify-between text-xs text-slate-500 mb-1"><span>Tiêu dùng: ${formatMoney(spent)}</span><span>Hạn mức: ${formatMoney(b.limit)}</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="${color} h-2 rounded-full" style="width: ${percent}%"></div></div></div>`;
+                });
+            }
 
-            // Mục tiêu tiết kiệm
-            const sContainer = document.getElementById('utilSavingList'); sContainer.innerHTML = '';
-            userFinanceData.savings.forEach(s => {
-                const percent = Math.min((s.current / s.target) * 100, 100);
-                sContainer.innerHTML += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-100 group space-y-2"><div class="flex justify-between"><span class="font-bold text-slate-700">${s.name}</span><button onclick="deleteItem('savings',${s.id})" class="text-rose-500 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">Xóa</button></div><div class="flex justify-between text-xs text-slate-500"><span>Đã có: ${formatMoney(s.current)}</span><span>Mục tiêu: ${formatMoney(s.target)}</span></div><div class="w-full bg-slate-200 rounded-full h-1.5"><div class="bg-indigo-600 h-1.5 rounded-full" style="width: ${percent}%"></div></div><button onclick="updateUtilAmount('savings', ${s.id}, 'Nhập số tiền góp thêm:')" class="w-full text-center text-xs bg-white border border-slate-200 py-1.5 rounded-lg hover:bg-slate-100 font-bold transition">Tích lũy thêm</button></div>`;
-            });
+            // Tích lũy tiết kiệm
+            const sContainer = document.getElementById('utilSavingList');
+            if(sContainer) {
+                sContainer.innerHTML = '';
+                window.userFinanceData.savings.forEach(s => {
+                    const percent = s.target ? Math.min((s.current / s.target) * 100, 100) : 0;
+                    sContainer.innerHTML += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-2"><div class="flex justify-between"><span class="font-bold text-slate-700">${s.name}</span><button type="button" onclick="window.deleteItem('savings',${s.id})" class="text-rose-500 text-xs font-bold">Xóa</button></div><div class="flex justify-between text-xs text-slate-500"><span>Đã có: ${formatMoney(s.current)}</span><span>Mục tiêu: ${formatMoney(s.target)}</span></div><div class="w-full bg-slate-200 rounded-full h-1.5"><div class="bg-indigo-600 h-1.5 rounded-full" style="width: ${percent}%"></div></div><button type="button" onclick="window.updateUtilAmount('savings', ${s.id}, 'Nhập số tiền góp thêm:')" class="w-full text-center text-xs bg-white border border-slate-200 py-1.5 rounded-lg hover:bg-slate-100 font-bold transition">Tích lũy thêm</button></div>`;
+                });
+            }
 
-            // Vay và nợ
-            const dContainer = document.getElementById('utilDebtList'); dContainer.innerHTML = '';
-            userFinanceData.debts.forEach(d => {
-                const isChoVay = d.type === 'Cho vay';
-                dContainer.innerHTML += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center group"><div><p class="font-bold ${isChoVay?'text-emerald-600':'text-rose-600'}">${d.type}: ${d.person}</p><p class="text-xs text-slate-500">Đã trả: ${formatMoney(d.paid)} / ${formatMoney(d.amount)}</p></div><div class="flex gap-2 items-center"><button onclick="updateUtilAmount('debts', ${d.id}, 'Nhập số tiền đã thanh toán thêm:')" class="text-xs bg-slate-200 text-slate-700 px-2 py-1 rounded-lg hover:bg-slate-300 font-medium transition">Trả bớt</button><button onclick="deleteItem('debts',${d.id})" class="text-rose-500 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">X</button></div></div>`;
-            });
+            // Sổ vay nợ
+            const dContainer = document.getElementById('utilDebtList');
+            if(dContainer) {
+                dContainer.innerHTML = '';
+                window.userFinanceData.debts.forEach(d => {
+                    const isChoVay = d.type === 'Cho vay';
+                    dContainer.innerHTML += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center"><div><p class="font-bold ${isChoVay?'text-emerald-600':'text-rose-600'}">${d.type}: ${d.person}</p><p class="text-xs text-slate-500">Đã trả: ${formatMoney(d.paid)} / ${formatMoney(d.amount)}</p></div><div class="flex gap-2 items-center"><button type="button" onclick="window.updateUtilAmount('debts', ${d.id}, 'Nhập số tiền đã thanh toán thêm:')" class="text-xs bg-slate-200 text-slate-700 px-2 py-1 rounded-lg hover:bg-slate-300 font-medium transition">Trả bớt</button><button type="button" onclick="window.deleteItem('debts',${d.id})" class="text-rose-500 text-xs font-bold">X</button></div></div>`;
+                });
+            }
 
-            // Cấu hình khoản chi định kỳ
-            const rContainer = document.getElementById('utilRecurringList'); rContainer.innerHTML = '';
-            userFinanceData.recurring.forEach(r => {
-                rContainer.innerHTML += `<div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center group"><div><p class="font-bold text-slate-700 text-xs">${r.cat} <span class="bg-slate-200 px-1.5 py-0.5 rounded text-[9px] font-normal text-slate-500 ml-1">${r.cycle}</span></p><p class="text-[11px] ${r.type=='thu'?'text-emerald-600':'text-rose-600'} font-semibold">${r.type=='thu'?'+':'-'}${formatMoney(r.amount)}</p></div><button onclick="deleteItem('recurring',${r.id})" class="text-rose-500 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">Hủy</button></div>`;
-            });
-        }
+            // Giao dịch định kỳ
+            const rContainer = document.getElementById('utilRecurringList');
+            if(rContainer) {
+                rContainer.innerHTML = '';
+                window.userFinanceData.recurring.forEach(r => {
+                    rContainer.innerHTML += `<div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center"><div><p class="font-bold text-slate-700 text-xs">${r.cat} <span class="bg-slate-200 px-1.5 py-0.5 rounded text-[9px] font-normal text-slate-500 ml-1">${r.cycle}</span></p><p class="text-[11px] ${r.type=='thu'?'text-emerald-600':'text-rose-600'} font-semibold">${r.type=='thu'?'+':'-'}${formatMoney(r.amount)}</p></div><button type="button" onclick="window.deleteItem('recurring',${r.id})" class="text-rose-500 text-xs font-bold">Hủy</button></div>`;
+                });
+            }
+        };
 
-        function exportCSV() {
-            if (userFinanceData.transactions.length === 0) return alert('Không có dữ liệu để xuất!');
+        window.exportCSV = function() {
+            if (window.userFinanceData.transactions.length === 0) return alert('Không có dữ liệu để xuất!');
             const headers = ['Ngay Giao Dich', 'Phan Loai', 'So Tien', 'Danh Muc', 'Ghi Chu'];
-            const rows = userFinanceData.transactions.map(t => [t.date, t.type === 'thu' ? 'Thu nhap' : 'Chi tieu', t.amount, t.category, t.note || '']);
+            const rows = window.userFinanceData.transactions.map(t => [t.date, t.type === 'thu' ? 'Thu nhap' : 'Chi tieu', t.amount, t.category, t.note || '']);
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + headers.join(',') + "\n" + rows.map(e => e.join(',')).join("\n");
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `BaoCao_TaiChinh_${currentUser}.csv`);
+            link.setAttribute("download", `BaoCao_TaiChinh_${window.currentUser}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
+        };
+
+        // Tuyến tính kiểm tra duy nhất chạy khi toàn bộ DOM dựng xong
+        window.addEventListener('DOMContentLoaded', () => {
+            const qDateEl = document.getElementById('q-date');
+            if (qDateEl) qDateEl.valueAsDate = new Date();
+            
+            try {
+                const sessionUser = localStorage.getItem('sothuchi_current_user');
+                if (sessionUser) {
+                    let accounts = getAccountsSafe();
+                    if (accounts[sessionUser]) {
+                        window.currentUser = sessionUser;
+                        window.loginSuccess();
+                    } else {
+                        localStorage.removeItem('sothuchi_current_user');
+                    }
+                }
+            } catch(e) { localStorage.clear(); }
+        });
     </script>
 </body>
 </html>
